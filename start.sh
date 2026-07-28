@@ -300,7 +300,7 @@ load_previous_project_name() {
         PREVIOUS_PROJECT_SLUG=$(grep -m1 "^# .* — Environment Configuration" "$SCRIPT_DIR/.env" 2>/dev/null | sed "s/^# //; s/ — Environment Configuration//" || true)
     fi
 
-    [ -z "$PREVIOUS_PROJECT_SLUG" ] && PREVIOUS_PROJECT_SLUG="base_project"
+    [ -z "$PREVIOUS_PROJECT_SLUG" ] && PREVIOUS_PROJECT_SLUG="online_shop"
     PREVIOUS_PROJECT_DASH="${PREVIOUS_PROJECT_SLUG//_/-}"
 }
 # ─────────────────────────────────────────────

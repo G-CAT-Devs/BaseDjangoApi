@@ -1,4 +1,4 @@
-# 🚀 Base API Django
+# 🚀 Online Shop API
 
 A production-ready Django REST Framework template for building backend APIs. Includes user authentication, ticketing system, notifications, feedback, billing, and more — all pre-configured and ready to customize.
 

@@ -21,9 +21,9 @@ if settings.DEBUG:
 
     schema_view = get_schema_view(
         openapi.Info(
-            title="Base Project API",
+            title="Online Shop API",
             default_version="v1",
-            description="API documentation for Base Project",
+            description="API documentation for Online Shop",
         ),
         public=True,
         permission_classes=[permissions.AllowAny],
