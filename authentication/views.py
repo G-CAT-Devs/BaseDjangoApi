@@ -1,8 +1,11 @@
 from django.conf import settings
 from django.contrib.auth import get_user_model, logout
+from django.contrib.auth.tokens import default_token_generator
+from django.core.mail import send_mail
 from django.shortcuts import redirect
 from django.urls import reverse
-from django.utils.http import url_has_allowed_host_and_scheme
+from django.utils.encoding import force_bytes
+from django.utils.http import url_has_allowed_host_and_scheme, urlsafe_base64_encode
 from django.views import View
 from drf_yasg.utils import swagger_auto_schema
 from rest_framework import generics, status
@@ -12,7 +15,14 @@ from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.views import TokenObtainPairView
 
-from .serializers import LogoutSerializer, MyTokenObtainPairSerializer, UserRegisterSerializer
+from .serializers import (
+    ChangePasswordSerializer,
+    LogoutSerializer,
+    MyTokenObtainPairSerializer,
+    PasswordResetConfirmSerializer,
+    PasswordResetRequestSerializer,
+    UserRegisterSerializer,
+)
 
 User = get_user_model()
 
@@ -70,3 +80,71 @@ class LogoutView(APIView):
             return Response(status=status.HTTP_204_NO_CONTENT)
         except Exception as e:
             return Response({"detail": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChangePasswordView(APIView):
+    permission_classes = (IsAuthenticated,)
+
+    @swagger_auto_schema(
+        request_body=ChangePasswordSerializer,
+        responses={200: "Password changed successfully."},
+    )
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data, context={"request": request})
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Password changed successfully."}, status=status.HTTP_200_OK)
+
+
+class PasswordResetRequestView(APIView):
+    permission_classes = (AllowAny,)
+
+    @swagger_auto_schema(
+        request_body=PasswordResetRequestSerializer,
+        responses={200: "Password reset link sent if email exists."},
+    )
+    def post(self, request):
+        serializer = PasswordResetRequestSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        email = serializer.validated_data["email"]
+        user = User.objects.filter(email=email).first()
+
+        if user:
+            token = default_token_generator.make_token(user)
+            uidb64 = urlsafe_base64_encode(force_bytes(user.pk))
+            subject = "Password Reset Requested"
+            message = (
+                f"Hello {user.username},\n\n"
+                f"You requested a password reset. Use the following details to reset your password:\n\n"
+                f"UID: {uidb64}\n"
+                f"Token: {token}\n\n"
+                f"If you did not request this, please ignore this email."
+            )
+            send_mail(
+                subject,
+                message,
+                getattr(settings, "DEFAULT_FROM_EMAIL", "noreply@example.com"),
+                [user.email],
+                fail_silently=True,
+            )
+
+        return Response(
+            {"detail": "If an account with that email exists, a password reset email has been sent."},
+            status=status.HTTP_200_OK,
+        )
+
+
+class PasswordResetConfirmView(APIView):
+    permission_classes = (AllowAny,)
+
+    @swagger_auto_schema(
+        request_body=PasswordResetConfirmSerializer,
+        responses={200: "Password reset successful."},
+    )
+    def post(self, request):
+        serializer = PasswordResetConfirmSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
+

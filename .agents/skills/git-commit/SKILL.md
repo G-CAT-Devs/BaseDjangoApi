@@ -112,7 +112,7 @@ EOF
 - One logical change per commit
 - Present tense: "add" not "added"
 - Imperative mood: "fix bug" not "fixes bug"
-- Reference issues: `Closes #123`, `Refs #456`
+- **Auto-closing GitHub Issues**: Always include issue reference keywords in the commit message footer or title (e.g. `Resolves #123`, `Closes #123`, `Fixes #123`). Never close GitHub issues manually via API when a commit/PR will resolve them automatically on push.
 - Keep description under 72 characters
 
 ## Git Safety Protocol

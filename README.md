@@ -87,6 +87,9 @@ python manage.py runserver
 | `POST /api/v1/auth/login/` | Login (returns JWT + user data) |
 | `POST /api/v1/auth/login/refresh/` | Refresh JWT token |
 | `POST /api/v1/auth/logout/` | Logout (blacklists refresh token) |
+| `POST /api/v1/auth/change-password/` | Change password (authenticated) |
+| `POST /api/v1/auth/password-reset/` | Request password reset email |
+| `POST /api/v1/auth/password-reset/confirm/` | Confirm password reset |
 | **User** | |
 | `PATCH /api/v1/accounts/profile/update/` | Update profile |
 | **Dashboard (User)** | |
