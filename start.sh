@@ -9,7 +9,7 @@ set -Eeuo pipefail
 IFS=$'\n\t'
 
 # ─────────────────────────────────────────────
-# OS Detection
+# OS & Python Detection
 # ─────────────────────────────────────────────
 detect_os() {
     case "$(uname -s)" in
@@ -18,6 +18,31 @@ detect_os() {
         CYGWIN*|MINGW*|MSYS*) OS_TYPE="windows" ;;
         *)          OS_TYPE="unknown" ;;
     esac
+}
+
+PYTHON_CMD="python"
+detect_python() {
+    if [ "${OS_TYPE:-}" = "windows" ]; then
+        if command -v python >/dev/null 2>&1 && python -c "import sys" >/dev/null 2>&1; then
+            PYTHON_CMD="python"
+        elif command -v py >/dev/null 2>&1 && py -c "import sys" >/dev/null 2>&1; then
+            PYTHON_CMD="py"
+        elif command -v python3 >/dev/null 2>&1 && python3 -c "import sys" >/dev/null 2>&1; then
+            PYTHON_CMD="python3"
+        else
+            PYTHON_CMD="python"
+        fi
+    else
+        if command -v python3 >/dev/null 2>&1 && python3 -c "import sys" >/dev/null 2>&1; then
+            PYTHON_CMD="python3"
+        elif command -v python >/dev/null 2>&1 && python -c "import sys" >/dev/null 2>&1; then
+            PYTHON_CMD="python"
+        elif command -v py >/dev/null 2>&1 && py -c "import sys" >/dev/null 2>&1; then
+            PYTHON_CMD="py"
+        else
+            PYTHON_CMD="python"
+        fi
+    fi
 }
 
 # ─────────────────────────────────────────────
@@ -263,12 +288,12 @@ spinner() {
 }
 
 generate_secret_key() {
-    python3 -c "import secrets; print(''.join(secrets.choice('abcdefghijklmnopqrstuvwxyz0123456789_-') for _ in range(50)))" 2>/dev/null || \
+    "$PYTHON_CMD" -c "import secrets; print(''.join(secrets.choice('abcdefghijklmnopqrstuvwxyz0123456789_-') for _ in range(50)))" 2>/dev/null || \
     head -c 50 /dev/urandom | base64 | tr -dc 'a-zA-Z0-9' | head -c 50
 }
 
 env_quote() {
-    python3 -c 'import shlex, sys; print(shlex.quote(sys.argv[1]))' "$1"
+    "$PYTHON_CMD" -c 'import shlex, sys; print(shlex.quote(sys.argv[1]))' "$1"
 }
 load_previous_project_name() {
     if [ -f "$SCRIPT_DIR/.env" ]; then
@@ -818,6 +843,7 @@ apply_finish() {
 # ═══════════════════════════════════════════════
 main() {
     detect_os
+    detect_python
     setup_colors
     load_previous_project_name
     if [ ! -f "$SCRIPT_DIR/manage.py" ]; then
