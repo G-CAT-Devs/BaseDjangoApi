@@ -1,6 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
+from django.core.cache import cache
 from django.urls import reverse
 from django.utils.encoding import force_bytes
 from django.utils.http import urlsafe_base64_encode
@@ -13,6 +14,7 @@ User = get_user_model()
 
 class AuthenticationTestCase(APITestCase):
     def setUp(self):
+        cache.clear()
         self.register_url = reverse("auth_register")
         self.login_url = reverse("auth_login")
         self.refresh_url = reverse("auth_refresh")
@@ -233,4 +235,12 @@ class AuthenticationTestCase(APITestCase):
             },
         )
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_auth_rate_limiting_throttles_excessive_requests(self):
+        for _ in range(5):
+            self.client.post(self.password_reset_url, {"email": "test@example.com"})
+
+        response = self.client.post(self.password_reset_url, {"email": "test@example.com"})
+        self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+
 

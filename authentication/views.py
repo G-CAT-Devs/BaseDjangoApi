@@ -55,10 +55,12 @@ class UserRegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     permission_classes = (AllowAny,)
     serializer_class = UserRegisterSerializer
+    throttle_scope = "auth"
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
     serializer_class = MyTokenObtainPairSerializer
+    throttle_scope = "auth"
 
 
 class LogoutView(APIView):
@@ -98,6 +100,7 @@ class ChangePasswordView(APIView):
 
 class PasswordResetRequestView(APIView):
     permission_classes = (AllowAny,)
+    throttle_scope = "auth"
 
     @swagger_auto_schema(
         request_body=PasswordResetRequestSerializer,
@@ -137,6 +140,7 @@ class PasswordResetRequestView(APIView):
 
 class PasswordResetConfirmView(APIView):
     permission_classes = (AllowAny,)
+    throttle_scope = "auth"
 
     @swagger_auto_schema(
         request_body=PasswordResetConfirmSerializer,

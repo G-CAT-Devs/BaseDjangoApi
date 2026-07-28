@@ -213,6 +213,16 @@ REST_FRAMEWORK = {
     "DEFAULT_PAGINATION_CLASS": "config.pagination.DefaultPagination",
     "PAGE_SIZE": 10,
     "EXCEPTION_HANDLER": "config.exception_handler.custom_exception_handler",
+    "DEFAULT_THROTTLE_CLASSES": (
+        "rest_framework.throttling.AnonRateThrottle",
+        "rest_framework.throttling.UserRateThrottle",
+        "rest_framework.throttling.ScopedRateThrottle",
+    ),
+    "DEFAULT_THROTTLE_RATES": {
+        "anon": env.str("REST_THROTTLE_ANON_RATE", default="100/day"),
+        "user": env.str("REST_THROTTLE_USER_RATE", default="1000/day"),
+        "auth": env.str("REST_THROTTLE_AUTH_RATE", default="5/minute"),
+    },
 }
 
 # --- SimpleJWT Settings ---
