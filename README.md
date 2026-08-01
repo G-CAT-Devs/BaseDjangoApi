@@ -90,6 +90,9 @@ python manage.py runserver
 | `POST /api/v1/auth/change-password/` | Change password (authenticated) |
 | `POST /api/v1/auth/password-reset/` | Request password reset email |
 | `POST /api/v1/auth/password-reset/confirm/` | Confirm password reset |
+| `POST /api/v1/auth/social/google/` | Google OAuth2 Social Login |
+| `POST /api/v1/auth/social/github/` | GitHub OAuth2 Social Login |
+| `POST /api/v1/auth/social/apple/` | Apple OAuth2 Social Login |
 | **User** | |
 | `PATCH /api/v1/accounts/profile/update/` | Update profile |
 | **Dashboard (User)** | |

@@ -38,16 +38,26 @@ DJANGO_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sites",
 ]
 
 THIRD_PARTY_APPS = [
     "rest_framework",
+    "rest_framework.authtoken",
     "rest_framework_simplejwt",
     "rest_framework_simplejwt.token_blacklist",
     "corsheaders",
     "storages",
     "django_filters",
     "drf_yasg",
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.github",
+    "allauth.socialaccount.providers.apple",
+    "dj_rest_auth",
+    "dj_rest_auth.registration",
 ]
 
 LOCAL_APPS = [
@@ -71,6 +81,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "allauth.account.middleware.AccountMiddleware",
 ]
 
 # --- URLs and WSGI ---
@@ -233,6 +244,47 @@ SIMPLE_JWT = {
     "BLACKLIST_AFTER_ROTATION": True,
     "AUTH_HEADER_TYPES": ("Bearer",),
 }
+
+# --- Social Auth & dj-rest-auth Settings ---
+SITE_ID = 1
+
+AUTHENTICATION_BACKENDS = (
+    "django.contrib.auth.backends.ModelBackend",
+    "allauth.account.auth_backends.AuthenticationBackend",
+)
+
+REST_AUTH = {
+    "USE_JWT": True,
+    "JWT_AUTH_HTTPONLY": False,
+}
+
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        "APP": {
+            "client_id": env.str("GOOGLE_OAUTH_CLIENT_ID", default=""),
+            "secret": env.str("GOOGLE_OAUTH_SECRET", default=""),
+            "key": "",
+        },
+        "SCOPE": ["profile", "email"],
+        "AUTH_PARAMS": {"access_type": "online"},
+    },
+    "github": {
+        "APP": {
+            "client_id": env.str("GITHUB_OAUTH_CLIENT_ID", default=""),
+            "secret": env.str("GITHUB_OAUTH_SECRET", default=""),
+            "key": "",
+        },
+        "SCOPE": ["user", "user:email"],
+    },
+    "apple": {
+        "APP": {
+            "client_id": env.str("APPLE_OAUTH_CLIENT_ID", default=""),
+            "secret": env.str("APPLE_OAUTH_SECRET", default=""),
+            "key": "",
+        },
+    },
+}
+
 
 SWAGGER_SETTINGS = {
     "SECURITY_DEFINITIONS": {

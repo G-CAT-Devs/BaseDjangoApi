@@ -19,6 +19,18 @@ def custom_exception_handler(exc, context):
     response = exception_handler(exc, context)
 
     if response is None:
+        try:
+            from allauth.socialaccount.providers.oauth2.client import OAuth2Error
+
+            if isinstance(exc, OAuth2Error):
+                logger.warning(f"OAuth2Error: {str(exc)}")
+                return Response(
+                    {"detail": f"Social authentication failed: {str(exc)}"},
+                    status=status.HTTP_400_BAD_REQUEST,
+                )
+        except ImportError:
+            pass
+
         # Handle Database Integrity Errors (e.g., duplicate unique constraint, foreign key violation)
         if isinstance(exc, IntegrityError):
             logger.warning(f"IntegrityError: {str(exc)}", exc_info=True)

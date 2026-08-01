@@ -1,3 +1,8 @@
+from allauth.socialaccount.providers.apple.views import AppleOAuth2Adapter
+from allauth.socialaccount.providers.github.views import GitHubOAuth2Adapter
+from allauth.socialaccount.providers.google.views import GoogleOAuth2Adapter
+from allauth.socialaccount.providers.oauth2.client import OAuth2Client
+from dj_rest_auth.registration.views import SocialLoginView
 from django.conf import settings
 from django.contrib.auth import get_user_model, logout
 from django.contrib.auth.tokens import default_token_generator
@@ -151,4 +156,25 @@ class PasswordResetConfirmView(APIView):
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response({"detail": "Password has been reset successfully."}, status=status.HTTP_200_OK)
+
+
+class GoogleLoginView(SocialLoginView):
+    adapter_class = GoogleOAuth2Adapter
+    callback_url = "https://developers.google.com/oauthplayground"
+    client_class = OAuth2Client
+    throttle_scope = "auth"
+
+
+class GitHubLoginView(SocialLoginView):
+    adapter_class = GitHubOAuth2Adapter
+    callback_url = "https://github.com"
+    client_class = OAuth2Client
+    throttle_scope = "auth"
+
+
+class AppleLoginView(SocialLoginView):
+    adapter_class = AppleOAuth2Adapter
+    client_class = OAuth2Client
+    throttle_scope = "auth"
+
 

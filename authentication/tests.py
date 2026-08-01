@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
@@ -22,6 +24,9 @@ class AuthenticationTestCase(APITestCase):
         self.change_password_url = reverse("auth_change_password")
         self.password_reset_url = reverse("auth_password_reset")
         self.password_reset_confirm_url = reverse("auth_password_reset_confirm")
+        self.google_login_url = reverse("auth_google")
+        self.github_login_url = reverse("auth_github")
+        self.apple_login_url = reverse("auth_apple")
 
         self.user_data = {
             "username": "authuser",
@@ -242,5 +247,23 @@ class AuthenticationTestCase(APITestCase):
 
         response = self.client.post(self.password_reset_url, {"email": "test@example.com"})
         self.assertEqual(response.status_code, status.HTTP_429_TOO_MANY_REQUESTS)
+
+    def test_google_social_login_invalid_token(self):
+        response = self.client.post(self.google_login_url, {"access_token": "invalid-token"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_github_social_login_invalid_token(self):
+        response = self.client.post(self.github_login_url, {"access_token": "invalid-token"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_apple_social_login_invalid_token(self):
+        response = self.client.post(self.apple_login_url, {"id_token": "invalid-token"})
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
 
 
