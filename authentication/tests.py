@@ -1,5 +1,3 @@
-from unittest.mock import patch
-
 from django.contrib.auth import get_user_model
 from django.contrib.auth.tokens import default_token_generator
 from django.core import mail
